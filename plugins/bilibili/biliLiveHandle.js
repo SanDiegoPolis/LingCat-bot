@@ -119,7 +119,7 @@ const getEveryLiveStatus = async (bot) => {
     for (const id in liveList) {
         let g = bot.pickGroup(Number(id));
         // 构造虚拟通知类数据 使得通过权限验证
-        if (!getPermission({ "group_id": id, "post_type": "notice", "notice_type": "group", "group": { "mute_left": g.mute_left } }, __dirname)) return;
+        if (!getPermission({ "group_id": id, "post_type": "notice", "notice_type": "group", "group": { "mute_left": g.mute_left } }, __dirname)) continue;
         liveList[id].forEach(async (live) => {
             const uid = Number(live["uid"]);
             let uname = await getUpName(uid);
