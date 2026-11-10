@@ -41,16 +41,12 @@ function apply(hook) {
                 break;
             } else if (arg == "t") {
                 if (e.data.raw_message.trim() == "#dida") break;
-                let time = "";
-                if (e.args[arg] == "current") {
+                let time = e.args[arg];
+                if (time === "current") {
                     time = getCurrentTimeStr();
-                } else {
-                    if (Number.isInteger(Number(e.args[arg])) && e.args[arg].length == 4)
-                        time = e.args[arg];
-                    else {
-                        e.data.reply(["设定的时间应为四位数字，如8:05应设置为0805"]);
-                        break;
-                    }
+                } else if (typeof time !== "string" || time.length !== 4 || !/^(?:[01]\d|2[0-3])[0-5]\d$/.test(time)) {
+                    e.data.reply(["设定的时间应为有效的四位24小时制时间，如8:05应设置为0805"]);
+                    return;
                 }
                 e.data.reply(await addDida(e.data.group_id, time, e.data, e.args["_"]));
                 subCmd = true;
