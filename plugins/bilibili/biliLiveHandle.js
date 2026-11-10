@@ -121,8 +121,9 @@ const getEveryLiveStatus = async (bot) => {
         // 构造虚拟通知类数据 使得通过权限验证
         if (!getPermission({ "group_id": id, "post_type": "notice", "notice_type": "group", "group": { "mute_left": g.mute_left } }, __dirname)) return;
         liveList[id].forEach(async (live) => {
-            let uname = await getUpName(Number(live["uid"]));
-            let liveStatus = await getLiveInfo(Number(live["uid"]));
+            const uid = Number(live["uid"]);
+            let uname = await getUpName(uid);
+            let liveStatus = await getLiveInfo(uid);
             if (!(uname && liveStatus)) return;
             let coverPic = liveStatus?.cover;
             let status = liveStatus?.liveStatus === 1 ? true : false;
@@ -130,9 +131,12 @@ const getEveryLiveStatus = async (bot) => {
             let url = liveStatus?.url;
             if (!(liveTitle && url)) return;
             if (status !== live["status"]) {
-                live["status"] = status;
-                data.removeUp(Number(live["uid"]), Number(id));
-                data.addUp(live, Number(id));
+                const currentData = new Data();
+                const currentLive = currentData.getUpList(Number(id))
+                    .find(entry => Number(entry?.["uid"]) === uid);
+                if (!currentLive || currentLive["status"] === status) return;
+                currentLive["status"] = status;
+                currentData.dump();
                 if (status === true) {
                     await bot.sendGroupMsg(Number(id), [
                         segment.image(coverPic),
