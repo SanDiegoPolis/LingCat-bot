@@ -116,7 +116,7 @@ async function getEveryDida(bot) {
     for (const id in didaList) {
         let g = bot.pickGroup(Number(id));
         // 构造虚拟通知类数据 使得通过权限验证
-        if (!getPermission({ "group_id": id, "post_type": "notice", "notice_type": "group", "group": { "mute_left": g.mute_left } }, __dirname)) return;
+        if (!getPermission({ "group_id": id, "post_type": "notice", "notice_type": "group", "group": { "mute_left": g.mute_left } }, __dirname)) continue;
         for (const didaid in didaList[id]) {
             if (didaList[id][didaid]["time"] == getCurrentTimeStr()) {
                 await bot.sendGroupMsg(Number(id), buildSendableMsg_(didaList[id][didaid]["content"], id));
