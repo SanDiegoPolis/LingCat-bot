@@ -88,12 +88,12 @@ async function addDida(group_id, time, data, contentList) {
     let text = content[0]["text"];
     let content_index = text.indexOf(contentList.join("").substring(0, 1));
     content[0]["text"] = content_index == -1 ? "" : text.slice(content_index).trimStart();
+    await saveImg(content, group_id);
     new Data().addDida({
         "time": time,
         "content": content,
         "rawMessage": data.raw_message.slice(data.raw_message.indexOf(contentList.join("").substring(0, 10))).trimStart()
     }, group_id);
-    await saveImg(content, group_id);
     return `已添加定时任务！`;
 }
 
