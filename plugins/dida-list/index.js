@@ -107,6 +107,7 @@ function removeDida(group_id, didaid) {
 
 // 每一分钟检查一次定时任务
 async function getEveryDida(bot) {
+    const currentTime = getCurrentTimeStr();
     let data = new Data();
     let didaList = data.getDidaList();
     for (const id in didaList) {
@@ -114,8 +115,13 @@ async function getEveryDida(bot) {
         // 构造虚拟通知类数据 使得通过权限验证
         if (!getPermission({ "group_id": id, "post_type": "notice", "notice_type": "group", "group": { "mute_left": g.mute_left } }, __dirname)) continue;
         for (const didaid in didaList[id]) {
-            if (didaList[id][didaid]["time"] == getCurrentTimeStr()) {
-                await bot.sendGroupMsg(Number(id), buildSendableMsg_(didaList[id][didaid]["content"], id));
+            const task = didaList[id][didaid];
+            if (task["time"] == currentTime) {
+                try {
+                    await bot.sendGroupMsg(Number(id), buildSendableMsg_(task["content"], id));
+                } catch (error) {
+                    bot.logger.error(`滴答任务 ${didaid} 发送到群 ${id} 失败`, error);
+                }
             }
         }
     }
@@ -149,7 +155,8 @@ function buildSendableMsg_(message, gid) {
 }
 
 function getCurrentTimeStr() {
-    return PrefixInteger(new Date().getHours(), 2) + PrefixInteger(new Date().getMinutes(), 2);
+    const now = new Date();
+    return PrefixInteger(now.getHours(), 2) + PrefixInteger(now.getMinutes(), 2);
     function PrefixInteger(num, m) {
         return (Array(m).join(0) + num).slice(-m);
     }
