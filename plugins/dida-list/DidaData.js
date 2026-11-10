@@ -38,8 +38,13 @@ class Data {
         // dida => {"time":"0830","content":message,"rawMessage":""}
         const gid = String(group_id);
         let didaList = this.getDidaList(group_id);
-        let id = getCurrentIdStr();
-        if (Object.keys(didaList).indexOf(id) !== -1) id += new Date().getSeconds();
+        const minuteId = getCurrentIdStr();
+        let id = minuteId;
+        let suffix = new Date().getSeconds();
+        while (Object.prototype.hasOwnProperty.call(didaList, id)) {
+            id = `${minuteId}${suffix}`;
+            suffix++;
+        }
         didaList[`${id}`] = dida;
         this._dida_list[gid] = didaList;
         this.dump();
